@@ -2,6 +2,8 @@ package com.ztpai.api.dao;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.GenerationTime;
 
 import java.sql.Timestamp;
 
@@ -19,13 +21,10 @@ public class UserDao {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
-    private String password;
-
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "is_creator", nullable = false)
+    @Column(name = "is_creator", nullable = false, columnDefinition = "boolean default false")
     private boolean isCreator;
 
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -34,15 +33,15 @@ public class UserDao {
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private java.util.Set<FollowingsDao> followers;
 
-    @Column(name = "is_admin", nullable = false)
+    @Column(name = "is_admin", nullable = false, columnDefinition = "boolean default false")
     private boolean isAdmin;
 
-    @Column(name = "is_moderator", nullable = false)
+    @Column(name = "is_moderator", nullable = false, columnDefinition = "boolean default false")
     private boolean isModerator;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
     private boolean isActive;
 
-    @Column(name = "registration_date", nullable = false)
+    @Column(name = "registration_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", insertable = false, updatable = false)
     private Timestamp registrationDate;
 }

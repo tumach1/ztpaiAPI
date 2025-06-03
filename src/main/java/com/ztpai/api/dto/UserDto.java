@@ -1,12 +1,14 @@
 package com.ztpai.api.dto;
 
+import java.util.Set;
+
 public class UserDto {
     private Long id;
     private String username;
     private String email;
-    private String firstName;
-    private String lastName;
-    private String profilePictureUrl;
+//    private String profilePictureUrl;
+    private Set<UserDto> followers = new java.util.HashSet<>();
+    private Set<UserDto> followings = new java.util.HashSet<>();
 
     // Getters and Setters
     public Long getId() {
@@ -33,27 +35,27 @@ public class UserDto {
         this.email = email;
     }
 
-    public String getFirstName() {
-        return firstName;
+//    public String getProfilePictureUrl() {
+//        return profilePictureUrl;
+//    }
+//
+//    public void setProfilePictureUrl(String profilePictureUrl) {
+//        this.profilePictureUrl = profilePictureUrl;
+//    }
+//
+    public Set<UserDto> getFollowers() {
+        return followers;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFollowers(Set<UserDto> followers) {
+        this.followers = followers;
     }
 
-    public String getLastName() {
-        return lastName;
+    public Set<UserDto> getFollowings() {
+        return followings;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
+    public void setFollowings(Set<UserDto> followings) {
+        this.followings = followings;
     }
 }
