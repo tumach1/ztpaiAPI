@@ -1,29 +1,30 @@
 package com.ztpai.api.Mappers;
 
-import com.ztpai.api.dao.FollowingsDao;
 import com.ztpai.api.dao.UserDao;
 import com.ztpai.api.dto.UserDto;
 
 import java.util.Set;
 
 public class UserMapper {
-    public static UserDto toDto(UserDao user) {
+    public static UserDto toDto(UserDao user, boolean isEmailSensitive) {
         if (user == null) {
             return null;
         }
         UserDto userDto = new UserDto();
         userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-//        Set<UserDto> followers = user.getFollowers();
-        for (FollowingsDao follower : user.getFollowers()) {
-            UserDto followerDto = new UserDto();
-            followerDto.setId(follower.getFollower().getId());
-            followerDto.setUsername(follower.getFollower().getUsername());
-            followerDto.setEmail(follower.getFollower().getEmail());
-            userDto.getFollowers().add(followerDto);
-            System.out.println(followerDto);
+        if (isEmailSensitive) {
+            userDto.setEmail(user.getEmail());
+        } else {
+            userDto.setEmail(null);
         }
+        userDto.setEmail(user.getEmail());
+        userDto.setFollowersCount(
+            user.getFollowers() == null ? 0 : user.getFollowers().size()
+        );
+        userDto.setFollowingsCount(
+            user.getFollowings() == null ? 0 : user.getFollowings().size()
+        );
         return userDto;
     }
 

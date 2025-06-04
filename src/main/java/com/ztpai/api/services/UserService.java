@@ -12,17 +12,17 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public UserDto findById(Long id) {
-        return UserMapper.toDto(userRepository.findById(id).orElse(null));
+    public UserDao findById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
-    public UserDto findByUsername(String username) {
+    public UserDao findByUsername(String username) {
         UserDao user = userRepository.findByUsername(username);
-        return UserMapper.toDto(user);
+        return user;
     }
 
-    public UserDto findByEmail(String email) {
+    public UserDao findByEmail(String email) {
         UserDao user = userRepository.findByEmail(email);
-        return UserMapper.toDto(user);
+        return user;
     }
 
     public boolean existsByUsername(String username) {
@@ -34,7 +34,8 @@ public class UserService {
     }
 
     public UserDao save(UserDto userDto) {
-        return userRepository.save(UserMapper.toDao(userDto));
+        UserDao userDao = UserMapper.toDao(userDto);
+        return userRepository.save(userDao);
     }
 
     public void deleteById(Long id) {

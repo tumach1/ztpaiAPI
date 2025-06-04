@@ -1,8 +1,8 @@
 package com.ztpai.api.web.controllers;
 
 import com.ztpai.api.Mappers.UserMapper;
+import com.ztpai.api.dao.FollowingsDao;
 import com.ztpai.api.dao.UserDao;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
 import com.ztpai.api.services.UserService;
 import com.ztpai.api.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
+import java.util.Set;
 
 @RestController
 public class userController {
@@ -27,9 +29,9 @@ public class userController {
     @GetMapping("/users/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         System.out.println("Fetching user with ID: " + id);
-        UserDto user = userService.findById(id);
-        if (user != null) {
-            return ResponseEntity.ok(user);
+        UserDao userDao = userService.findById(id);
+        if (userDao != null) {
+            return ResponseEntity.ok(UserMapper.toDto(userDao, false));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -44,17 +46,21 @@ public class userController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         UserDto createdUserDto;
-        createdUserDto = UserMapper.toDto(createdUser);
+        createdUserDto = UserMapper.toDto(createdUser, false);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUserDto);
     }
 
-//    @CrossOrigin(origins = "*")
-//    @PutMapping("/users/{id}")
-//    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-//        userDto.setId(id);
-//        UserDto updatedUser = userService.save(userDto);
-//        return ResponseEntity.ok(updatedUser);
-//    }
+    @CrossOrigin(origins = "*")
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+        userDto.setId(id);
+        UserDao updatedUser = userService.save(userDto);
+        if (updatedUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        UserDto updatedUserDto = UserMapper.toDto(updatedUser, false);
+        return ResponseEntity.ok(updatedUserDto);
+    }
 
     @CrossOrigin(origins = "*")
     @DeleteMapping("/users/{id}")
@@ -62,4 +68,37 @@ public class userController {
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/users/getFollowers/username/{username}")
+    public ResponseEntity<List<UserDto>> getFollowers(@PathVariable String username) {
+        UserDao user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        Set<FollowingsDao> followers = user.getFollowers();
+        if (followers == null || followers.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<UserDto> followersDtos = followers.stream()
+                .map(following -> UserMapper.toDto(following.getFollower(), false)).toList();
+        return ResponseEntity.ok(followersDtos);
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/users/getFollowings/username/{username}")
+    public ResponseEntity<List<UserDto>> getFollowings(@PathVariable String username) {
+        UserDao user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        Set<FollowingsDao> followings = user.getFollowings();
+        if (followings == null || followings.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<UserDto> followingsDtos = followings.stream()
+                .map(following -> UserMapper.toDto(following.getCreator(), false)).toList();
+        return ResponseEntity.ok(followingsDtos);
+    }
+
 }
