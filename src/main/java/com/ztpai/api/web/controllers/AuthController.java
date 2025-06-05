@@ -2,6 +2,7 @@ package com.ztpai.api.web.controllers;
 
 
 import com.ztpai.api.Mappers.UserMapper;
+import com.ztpai.api.Responses.LoginResponse;
 import com.ztpai.api.dao.UserDao;
 import com.ztpai.api.dto.AuthRequest;
 import com.ztpai.api.dto.UserDto;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -41,16 +43,20 @@ public class AuthController {
         return service.save(user).getUsername();
     }
 
-    // Removed the role checks here as they are already managed in SecurityConfig
-
+    @CrossOrigin(origins = "http://localhost:4200/")
     @PostMapping("/login")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<LoginResponse> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
         );
 
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getUsername());
+            LoginResponse loginResponse = new LoginResponse(
+                    jwtService.generateToken(authRequest.getUsername()),
+                    authRequest.getUsername()
+            );
+
+            return ResponseEntity.ok(loginResponse);
         } else {
             throw new UsernameNotFoundException("Invalid user request!");
         }
