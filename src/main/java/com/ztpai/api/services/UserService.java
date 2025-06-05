@@ -40,6 +40,7 @@ public class UserService {
     public UserDao save(UserDto userDto) {
         UserDao userDao = UserMapper.toDao(userDto);
         userDao.setPassword(encoder.encode(userDto.getPassword()));
+        userDao.setActive(true);
         return userRepository.save(userDao);
     }
 
