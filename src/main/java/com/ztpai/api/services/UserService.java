@@ -3,6 +3,7 @@ package com.ztpai.api.services;
 import com.ztpai.api.Mappers.UserMapper;
 import com.ztpai.api.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.ztpai.api.dao.UserDao;
 import com.ztpai.api.repositories.UserRepository;
@@ -12,11 +13,14 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public UserDao findById(Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
+    @Autowired
+    private PasswordEncoder encoder;
+
     public UserDao findByUsername(String username) {
-        UserDao user = userRepository.findByUsername(username);
+        UserDao user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) {
+            return null;
+        }
         return user;
     }
 
@@ -35,6 +39,7 @@ public class UserService {
 
     public UserDao save(UserDto userDto) {
         UserDao userDao = UserMapper.toDao(userDto);
+        userDao.setPassword(encoder.encode(userDto.getPassword()));
         return userRepository.save(userDao);
     }
 

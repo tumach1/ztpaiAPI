@@ -21,15 +21,18 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-public class userController {
+public class UserController {
     @Autowired
     private UserService userService;
 
     @CrossOrigin(origins = "*")
-    @GetMapping("/users/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        System.out.println("Fetching user with ID: " + id);
-        UserDao userDao = userService.findById(id);
+    @GetMapping("/users/{username}")
+    public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
+        System.out.println("Fetching user with ID: " + username);
+        UserDao userDao = userService.findByUsername(username);
+        System.out.println(userDao.getAuthorities().stream().map(
+                authority -> authority.getAuthority()).toList());;
+
         if (userDao != null) {
             return ResponseEntity.ok(UserMapper.toDto(userDao, false));
         } else {
@@ -100,5 +103,6 @@ public class userController {
                 .map(following -> UserMapper.toDto(following.getCreator(), false)).toList();
         return ResponseEntity.ok(followingsDtos);
     }
+
 
 }

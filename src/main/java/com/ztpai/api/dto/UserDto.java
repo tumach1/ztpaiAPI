@@ -11,7 +11,9 @@ public class UserDto {
     private Long id;
     private String username;
     private String email;
+    private String password;
 //    private String profilePictureUrl;
     private int followersCount;
     private int followingsCount;
+    private boolean isCreator;
 }

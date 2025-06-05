@@ -11,20 +11,17 @@ public class UserMapper {
             return null;
         }
         UserDto userDto = new UserDto();
+        System.out.println(user.isCreator());
         userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
         if (isEmailSensitive) {
-            userDto.setEmail(user.getEmail());
-        } else {
-            userDto.setEmail(null);
-        }
-        userDto.setEmail(user.getEmail());
+            userDto.setEmail(user.getEmail());}
         userDto.setFollowersCount(
             user.getFollowers() == null ? 0 : user.getFollowers().size()
         );
         userDto.setFollowingsCount(
             user.getFollowings() == null ? 0 : user.getFollowings().size()
-        );
+            );
         return userDto;
     }
 
