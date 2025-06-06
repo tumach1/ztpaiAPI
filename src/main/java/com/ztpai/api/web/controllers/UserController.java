@@ -27,7 +27,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/users/me")
+    @CrossOrigin(origins = "localhost:4200")
+@GetMapping("/users/me")
     public ResponseEntity<UserDto> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDao user = userService.getUserByUsername(authentication.getName());
@@ -38,7 +39,8 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
     
-    @GetMapping("/users/{username}")
+    @CrossOrigin(origins = "localhost:4200")
+@GetMapping("/users/{username}")
     public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
         UserDao userDao = userService.findByUsername(username);
         System.out.println(userDao.getAuthorities().stream().map(
@@ -51,7 +53,7 @@ public class UserController {
         }
     }
 
-    @CrossOrigin(origins = "*")
+    
     @PutMapping("/users/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
         userDto.setId(id);
@@ -63,7 +65,7 @@ public class UserController {
         return ResponseEntity.ok(updatedUserDto);
     }
 
-    @CrossOrigin(origins = "*")
+    
     @DeleteMapping("/users")
     public ResponseEntity<Void> deleteUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -72,8 +74,9 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @CrossOrigin(origins = "*")
-    @GetMapping("/users/getFollowers/username/{username}")
+    
+    @CrossOrigin(origins = "localhost:4200")
+@GetMapping("/users/getFollowers/username/{username}")
     public ResponseEntity<List<UserDto>> getFollowers(@PathVariable String username) {
         UserDao user = userService.findByUsername(username);
         if (user == null) {
@@ -88,7 +91,8 @@ public class UserController {
         return ResponseEntity.ok(followersDtos);
     }
 
-    @CrossOrigin(origins = "*")
+    
+    @CrossOrigin(origins = "localhost:4200")
     @GetMapping("/users/getFollowings/username/{username}")
     public ResponseEntity<List<UserDto>> getFollowings(@PathVariable String username) {
         UserDao user = userService.findByUsername(username);
@@ -104,8 +108,8 @@ public class UserController {
         return ResponseEntity.ok(followingsDtos);
     }
 
-    @CrossOrigin("*")
-    @GetMapping("/users/search/{username}")
+    @CrossOrigin(origins = "http://localhost:4200")
+@GetMapping("/users/search/{username}")
     public ResponseEntity<List<UserDto>> searchUsers(@PathVariable String username) {
         List<UserDao> users = userService.searchByUsername(username);
         if (users == null || users.isEmpty()) {
@@ -116,5 +120,10 @@ public class UserController {
         return ResponseEntity.ok(userDtos);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PostMapping("/users/subscribe/{username}")
+    public ResponseEntity<> subscribe(@PathVariable String username){
+
+    }
 
 }

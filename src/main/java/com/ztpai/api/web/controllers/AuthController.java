@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -32,11 +31,13 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/welcome")
     public String welcome() {
         return "Welcome this endpoint is not secure";
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping("/register")
     public ResponseEntity<String> addNewUser(@RequestBody UserDto user) {
         try{
@@ -56,11 +57,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         if(!service.existsByUsername(authRequest.getUsername())) {
-            System.out.println("User not found with username: " + authRequest.getUsername());
+            
             throw new InvalidUsernameException("User not found with username: " + authRequest.getUsername());
         }
 
-        System.out.println("Here");
+        ;
         try{
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
@@ -74,12 +75,12 @@ public class AuthController {
                 return ResponseEntity.ok(loginResponse);
             }}
         catch (UsernameNotFoundException e) {
-            System.out.println("Invalid username: " + authRequest.getUsername());
+            
             throw new InvalidUsernameException("Invalid username: " + authRequest.getUsername());
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
-            System.out.println("Invalid password for user: " + authRequest.getUsername());
+            
             throw new InvalidPasswordException("Invalid password for user: " + authRequest.getUsername());
         }
 

@@ -27,6 +27,7 @@ public class PostController {
     @Autowired
     private UserService userService;
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPostById(@PathVariable Long id) {
         PostDao postDao = postService.findById(id);
@@ -42,6 +43,7 @@ public class PostController {
 
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/creator/{userId}")
     public ResponseEntity<Iterable<PostDto>> getPostsByCreatorId(@PathVariable  Long userId) {
         Iterable<PostDao> postDaos = postService.findAllByCreatorId(userId);
@@ -58,7 +60,8 @@ public class PostController {
         }
     }
 
-    @GetMapping("/delete/{id}")
+    @CrossOrigin(origins = "http://localhost:4200")
+@GetMapping("/delete/{id}")
     public ResponseEntity<Void> deletePostById(@PathVariable Long id) {
         if (postService.existsById(id)) {
             postService.deleteById(id);
@@ -71,7 +74,7 @@ public class PostController {
 
     @PostMapping("/add")
     public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
-        System.out.println("title: "+postDto.getTitle());
+        
         PostDao postDao = PostMapper.toDao(postDto);
 
         System.out.println(postDao.getContent());
@@ -94,9 +97,12 @@ public class PostController {
         return ResponseEntity.ok(updatedPostDto);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200/")
     @GetMapping("/following")
     public ResponseEntity<List<PostDto>> getFollowingPosts() {
+        ;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
         UserDao user = userService.getUserByUsername(authentication.getName());
 
         List<UserDao> followings = user.getFollowings()

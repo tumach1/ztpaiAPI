@@ -26,7 +26,9 @@ public class MediaController {
         this.storageService = storageService;
     }
 
-    @GetMapping("/")
+    @CrossOrigin(origins = "http://localhost:4200")
+
+@GetMapping("/")
     public String listUploadedFiles(Model model) throws IOException {
 
         model.addAttribute("files", storageService.loadAll().map(
@@ -37,7 +39,9 @@ public class MediaController {
         return "uploadForm";
     }
 
-    @GetMapping("/files/{filename:.+}")
+    @CrossOrigin(origins = "http://localhost:4200")
+
+@GetMapping("/files/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
 
