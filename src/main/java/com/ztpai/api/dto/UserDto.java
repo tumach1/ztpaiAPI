@@ -16,4 +16,8 @@ public class UserDto {
     private int followersCount;
     private int followingsCount;
     private boolean isCreator;
+
+    public void setIsCreator(boolean isCreator) {
+        this.isCreator = isCreator;
+    }
 }

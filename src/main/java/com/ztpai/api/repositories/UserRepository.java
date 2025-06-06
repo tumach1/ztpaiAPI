@@ -3,6 +3,7 @@ package com.ztpai.api.repositories;
 import com.ztpai.api.dao.UserDao;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<UserDao, Long> {
@@ -14,4 +15,5 @@ public interface UserRepository extends CrudRepository<UserDao, Long> {
 
     boolean existsByEmail(String email);
 
+    List<UserDao> findByUsernameContainingIgnoreCase(String username);
 }

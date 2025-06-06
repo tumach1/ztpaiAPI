@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.ztpai.api.dao.UserDao;
 import com.ztpai.api.repositories.UserRepository;
 
+import java.util.List;
+
 @Service
 public class UserService {
     @Autowired
@@ -46,5 +48,20 @@ public class UserService {
 
     public void deleteById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public List<UserDao> searchByUsername(String username) {
+        if (username == null || username.isEmpty()) {
+            return List.of();
+        }
+        return userRepository.findByUsernameContainingIgnoreCase(username);
+    }
+
+    public UserDao getUserByUsername(String name) {
+    UserDao user = userRepository.findByUsername(name).orElse(null);
+        if (user == null) {
+            return null;
+        }
+        return user;
     }
 }

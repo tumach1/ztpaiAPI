@@ -11,9 +11,9 @@ public class UserMapper {
             return null;
         }
         UserDto userDto = new UserDto();
-        System.out.println(user.isCreator());
         userDto.setId(user.getId());
         userDto.setUsername(user.getUsername());
+        userDto.setIsCreator(user.isCreator());
         if (isEmailSensitive) {
             userDto.setEmail(user.getEmail());}
         userDto.setFollowersCount(
@@ -33,6 +33,7 @@ public class UserMapper {
         user.setId(userDto.getId());
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
+        user.setCreator(userDto.isCreator());
         return user;
     }
 

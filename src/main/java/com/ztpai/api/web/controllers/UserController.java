@@ -3,6 +3,8 @@ package com.ztpai.api.web.controllers;
 import com.ztpai.api.Mappers.UserMapper;
 import com.ztpai.api.dao.FollowingsDao;
 import com.ztpai.api.dao.UserDao;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,10 +27,19 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @CrossOrigin(origins = "*")
+    @GetMapping("/users/me")
+    public ResponseEntity<UserDto> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDao user = userService.getUserByUsername(authentication.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        UserDto userDto = UserMapper.toDto(user, true);
+        return ResponseEntity.ok(userDto);
+    }
+    
     @GetMapping("/users/{username}")
     public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
-        System.out.println("Fetching user with ID: " + username);
         UserDao userDao = userService.findByUsername(username);
         System.out.println(userDao.getAuthorities().stream().map(
                 authority -> authority.getAuthority()).toList());;
@@ -38,19 +49,6 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-    }
-
-    @CrossOrigin(origins = "*")
-    @PostMapping("/users")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-        System.out.println("Creating user: " + userDto.getUsername());
-        UserDao createdUser = userService.save(userDto);
-        if (createdUser == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        UserDto createdUserDto;
-        createdUserDto = UserMapper.toDto(createdUser, false);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUserDto);
     }
 
     @CrossOrigin(origins = "*")
@@ -66,9 +64,11 @@ public class UserController {
     }
 
     @CrossOrigin(origins = "*")
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
+    @DeleteMapping("/users")
+    public ResponseEntity<Void> deleteUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDao user = userService.getUserByUsername(authentication.getName());
+        userService.deleteById(user.getId());
         return ResponseEntity.noContent().build();
     }
 
@@ -102,6 +102,18 @@ public class UserController {
         List<UserDto> followingsDtos = followings.stream()
                 .map(following -> UserMapper.toDto(following.getCreator(), false)).toList();
         return ResponseEntity.ok(followingsDtos);
+    }
+
+    @CrossOrigin("*")
+    @GetMapping("/users/search/{username}")
+    public ResponseEntity<List<UserDto>> searchUsers(@PathVariable String username) {
+        List<UserDao> users = userService.searchByUsername(username);
+        if (users == null || users.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<UserDto> userDtos = users.stream()
+                .map(user -> UserMapper.toDto(user, false)).toList();
+        return ResponseEntity.ok(userDtos);
     }
 
 

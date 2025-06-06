@@ -1,22 +1,31 @@
 package com.ztpai.api.web.controllers;
 
 import com.ztpai.api.Mappers.PostMapper;
+import com.ztpai.api.dao.FollowingsDao;
 import com.ztpai.api.dao.PostDao;
+import com.ztpai.api.dao.UserDao;
 import com.ztpai.api.dto.PostDto;
 import com.ztpai.api.services.PostService;
+import com.ztpai.api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/posts")
 public class PostController {
     @Autowired
     PostService postService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPostById(@PathVariable Long id) {
@@ -83,6 +92,36 @@ public class PostController {
         }
         PostDto updatedPostDto = PostMapper.toDto(updatedPost, false);
         return ResponseEntity.ok(updatedPostDto);
+    }
+
+    @GetMapping("/following")
+    public ResponseEntity<List<PostDto>> getFollowingPosts() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDao user = userService.getUserByUsername(authentication.getName());
+
+        List<UserDao> followings = user.getFollowings()
+                .stream()
+                .map(FollowingsDao::getCreator)
+                .toList();
+
+        List<PostDao> postDaos = new ArrayList<>();
+        for (UserDao following : followings) {
+            for (PostDao post : following.getPosts()) {
+                if (!post.isFollowersOnly()) {
+                    postDaos.add(post);
+                }
+            }
+        }
+        if (postDaos.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<PostDto> postDtos = new ArrayList<>();
+        for (PostDao postDao : postDaos) {
+            if (!postDao.isFollowersOnly()) {
+                postDtos.add(PostMapper.toDto(postDao, false));
+            }
+        }
+        return ResponseEntity.ok(postDtos);
     }
 
 

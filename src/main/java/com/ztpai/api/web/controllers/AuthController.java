@@ -1,13 +1,10 @@
 package com.ztpai.api.web.controllers;
 
 
-import com.ztpai.api.Mappers.UserMapper;
 import com.ztpai.api.Responses.LoginResponse;
-import com.ztpai.api.dao.UserDao;
 import com.ztpai.api.dto.AuthRequest;
 import com.ztpai.api.dto.UserDto;
 import com.ztpai.api.exceptions.*;
-import com.ztpai.api.repositories.UserRepository;
 import com.ztpai.api.services.JwtService;
 import com.ztpai.api.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +40,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> addNewUser(@RequestBody UserDto user) {
         try{
-        service.save(user);}
+            service.save(user);}
         catch (Exception e) {
             if (e.getCause() != null && e.getCause().getMessage().contains("username")) {
                 throw new UsernameAlreadyExistException("Username already exists: " + user.getUsername());
@@ -101,4 +98,15 @@ public class AuthController {
         return new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
     }
 
-}
+    @ExceptionHandler(UsernameAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleUsernameAlreadyExistException(UsernameAlreadyExistException e) {
+        return new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
+    }
+
+    @ExceptionHandler(EmailAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleEmailAlreadyExistException(EmailAlreadyExistException e) {
+        return new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
+
+}}

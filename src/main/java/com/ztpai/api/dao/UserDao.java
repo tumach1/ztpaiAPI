@@ -40,6 +40,9 @@ public class UserDao implements UserDetails {
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private java.util.Set<FollowingsDao> followers;
 
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private java.util.Set<PostDao> posts;
+
     @Column(name = "is_admin", nullable = false, columnDefinition = "boolean default false")
     private boolean isAdmin;
 
