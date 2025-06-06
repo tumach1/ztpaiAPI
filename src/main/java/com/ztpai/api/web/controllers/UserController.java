@@ -120,10 +120,4 @@ public class UserController {
         return ResponseEntity.ok(userDtos);
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
-    @PostMapping("/users/subscribe/{username}")
-    public ResponseEntity<> subscribe(@PathVariable String username){
-
-    }
-
 }
